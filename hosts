@@ -1,0 +1,7 @@
+[masters]
+master_cent ansible_host=docker3 ansible_user=root
+master_ubu ansible_host=10.10.10.190 ansible_user=root
+
+[standbys]
+
+[followers]

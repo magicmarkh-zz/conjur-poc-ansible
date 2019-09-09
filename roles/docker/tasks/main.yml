@@ -1,0 +1,9 @@
+---
+# tasks file for docker
+- name: install Docker for Debian distros
+  import_tasks: docker-debian.yml  
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: install Docker for CentOS distro
+  import_tasks: docker-centos.yml
+  when: ansible_facts['distribution'] == "CentOS"

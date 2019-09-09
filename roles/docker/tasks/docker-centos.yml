@@ -1,0 +1,29 @@
+---
+# tasks file to configure docker on centos
+- name: install pre-requisite packages for Docker CE
+  yum: 
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: 0644
+
+- name: install docker ce, docker ce cli, and cotnainerd
+  yum: 
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+  notify: docker status
+  
+- name: enable docker to start on boot
+  systemd:
+    name: docker
+    enabled: yes
