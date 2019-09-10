@@ -48,6 +48,8 @@
     restart_policy: always
     entrypoint: ""
     command: sleep infinity
+    volumes:
+      - policy:/policy
 
 - name: initilaize cli container
   shell: docker exec -i {{dap_cli_container_name}} conjur init --account {{dap_account}} --url https://{{dap_master_container_name}} <<< yes

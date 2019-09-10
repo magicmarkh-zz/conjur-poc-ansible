@@ -1,0 +1,31 @@
+---
+# tasks file for poc-skeleton
+- name: copy policy files to docker volume created in previous step
+  copy:
+    src: files/policy/
+    dest: /var/lib/docker/volumes/policy/_data
+
+- name: update master name in cli password retrieval script
+  replace:
+    path: /var/lib/docker/volumes/policy/_data/cli-retrieve-password.sh
+    regexp: local master_name=
+    replace: local master_name={{ dap_master_container_name }}
+
+- name: update company name in cli password retrieval script
+  replace:
+    path: /var/lib/docker/volumes/policy/_data/cli-retrieve-password.sh
+    regexp: local company_name=
+    replace: local company_name={{ dap_account }}
+
+- name: login to cli container
+  command: docker exec {{ dap_cli_container_name }} conjur authn login -u admin -p {{ dap_initial_admin_password }}
+
+- name: load initial policies
+  command: "docker exec {{ dap_cli_container_name }} conjur policy load {{item}}"
+  with_items:
+    - root /policy/root.yml
+    - apps /policy/apps.yml
+    - apps/secrets /policy/secrets.yml
+
+- name: run script to set variables for secrets
+  script: files/set_vars.sh  {{ dap_cli_container_name }}
