@@ -6,7 +6,12 @@
       - yum-utils
       - device-mapper-persistent-data
       - lvm2
+      - python-pip
     state: present
+
+#install docker-py with pip
+- pip:
+    name: docker-py
 
 - name: Add Docker repo
   get_url:

@@ -1,6 +1,6 @@
 ---
 # tasks file for docker
-- name: install packages to allow apt to use repository over HTTPS
+- name: install pre-requisite packages
   apt: 
     name:
       - apt-transport-https
@@ -8,7 +8,12 @@
       - curl
       - gnupg-agent
       - software-properties-common
+      - python-pip
     state: present
+
+#install docker-py with pip
+- pip:
+    name: docker-py
 
 - name: Add Docker's Official GPG Key
   apt_key:

@@ -1,0 +1,10 @@
+---
+dap_image_name: "captainfluffytoes/dap"
+dap_version: "10.10"
+dap_docker_network_name: "dap"
+dap_master_container_name: "dap-master"
+dap_initial_admin_password: "Cyberark1"
+dap_account: "acme"
+dap_cli_image_name: "cyberark/conjur-cli"
+dap_cli_image_version: "5-latest"
+dap_cli_container_name: "dap-cli"

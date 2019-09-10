@@ -1,2 +1,55 @@
 ---
 # tasks file for master
+- name: pull dap master image
+  docker_image:
+    name: "{{dap_image_name}}"
+    tag: "{{dap_version}}"
+    source: pull
+
+- name: create docker network for dap
+  docker_network:
+    name: "{{dap_docker_network_name}}"
+
+- name: start dap master container
+  docker_container:
+    name: "{{dap_master_container_name}}"
+    image: "{{dap_image_name}}:{{dap_version}}"
+    networks:
+      - name: "{{dap_docker_network_name}}"
+    networks_cli_compatible: yes
+    restart_policy: always
+    security_opts:
+      - "seccomp:unconfined"
+    ports:
+      - "1999:1999"
+      - "5432:5432"
+      - "443:443"
+
+- name: get role of DAP master container
+  command: docker exec {{dap_master_container_name}} evoke role
+  register: container_role
+
+- name: configure dap master container
+  command: docker exec {{dap_master_container_name}} evoke configure master --hostname {{dap_master_container_name}} --admin-password {{dap_initial_admin_password}} {{dap_account}}
+  when: container_role.stdout == "blank"
+
+- name: pull conjur-cli image
+  docker_image:
+   name: "{{dap_cli_image_name}}:{{dap_cli_image_version}}"
+   source: pull
+
+- name: start cli container
+  docker_container:
+    name: "{{dap_cli_container_name}}"
+    image: "{{dap_cli_image_name}}:{{dap_cli_image_version}}"
+    networks:
+      - name: "{{dap_docker_network_name}}"
+    networks_cli_compatible: yes
+    restart_policy: always
+    entrypoint: ""
+    command: sleep infinity
+
+- name: initilaize cli container
+  shell: docker exec -i {{dap_cli_container_name}} conjur init --account {{dap_account}} --url https://{{dap_master_container_name}} <<< yes
+  args:
+    executable: /bin/bash
