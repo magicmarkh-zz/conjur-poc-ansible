@@ -21,27 +21,20 @@
       - seed:/seed
   when: inventory_hostname in groups['followers']
 
+- name: get role of DAP follower container
+  command: docker exec {{dap_follower_name}} evoke role
+  register: container_role
+  when: inventory_hostname in groups ['followers']
+
 - name: get seed file
   command: docker exec {{ dap_master_container_name }} evoke seed follower {{ dap_follower_name }} 
   register: seed
-  when: inventory_hostname in groups['masters']
+  when:
+    - inventory_hostname in groups['masters']
+    - hostvars['ubu']['container_role']['stdout'] == "blank"
 
-- name: create seed file on follower machine
-  copy:
-    content: "{{hostvars['cent']['seed']['stdout']}}"
-    dest: /var/lib/docker/volumes/seed/_data/seed.tar
-  when: inventory_hostname in groups['followers']
-
-- name: load seed file into container
-  command: docker exec -i {{ dap_follower_name }} evoke unpack seed /seed/seed.tar
-  when: inventory_hostname in groups['followers']
-
-- name: configure container as follower
-  command: docker exec {{ dap_follower_name }} evoke configure follower
-  when: inventory_hostname in groups['followers']
-
-- name: delete seed file
-  file:
-    path: /var/lib/docker/volumes/policy/_data/seed.tar
-    state: absent
-  when: inventory_hostname in groups['followers']
+- name: configure followers
+  import_tasks: configure-follower.yml
+  when: 
+    - hostvars['ubu']['container_role']['stdout'] == "blank"
+    - inventory_hostname in groups ['followers']
