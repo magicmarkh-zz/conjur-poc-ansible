@@ -31,10 +31,14 @@
   register: seed
   when:
     - inventory_hostname in groups['masters']
-    - hostvars['ubu']['container_role']['stdout'] == "blank"
+    - hostvars[item]['container_role']['stdout'] == "blank"
+  with_items:
+    - "{{ groups['followers']}}"
 
 - name: configure followers
-  import_tasks: configure-follower.yml
+  include_tasks: configure-follower.yml
   when: 
-    - hostvars['ubu']['container_role']['stdout'] == "blank"
+    - hostvars[item]['container_role']['stdout'] == "blank"
     - inventory_hostname in groups ['followers']
+  with_items:
+    - "{{ groups['followers']}}"

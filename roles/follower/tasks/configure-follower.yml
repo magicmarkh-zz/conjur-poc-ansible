@@ -1,11 +1,14 @@
 ---
 #follower configuration tasks
-
 - name: create seed file on follower machine
   copy:
-    content: "{{hostvars['cent']['seed']['stdout']}}"
+    content: "{{hostvars[inner_item]['seed']['results'][0]['stdout']}}"
     dest: /var/lib/docker/volumes/seed/_data/seed.tar
   when: inventory_hostname in groups['followers']
+  with_items:
+    - "{{ groups['masters'] }}"
+  loop_control:
+    loop_var: inner_item
 
 - name: load seed file into container
   command: docker exec -i {{ dap_follower_name }} evoke unpack seed /seed/seed.tar
