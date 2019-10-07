@@ -30,7 +30,7 @@
   register: container_role
 
 - name: configure dap master container
-  command: docker exec {{dap_master_container_name}} evoke configure master --hostname {{dap_master_container_name}} --admin-password {{dap_initial_admin_password}} {{dap_account}}
+  command: docker exec {{dap_master_container_name}} evoke configure master --accept-eula --hostname {{dap_master_container_name}} --admin-password {{dap_initial_admin_password}} {{dap_account}}
   when: container_role.stdout == "blank"
 
 - name: pull conjur-cli image
