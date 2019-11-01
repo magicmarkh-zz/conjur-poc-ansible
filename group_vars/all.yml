@@ -1,5 +1,5 @@
 ---
-dap_image_name: "captainfluffytoes/dap"
+dap_image_name: "cyberark/conjur"
 dap_version: "10.10"
 dap_docker_network_name: "dap"
 dap_master_container_name: "dap-master"
